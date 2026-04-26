@@ -49,19 +49,14 @@ window.Game = window.Game || {};
 
   function startMusic() {
     const a = ac(); if (!a || musicOn) return;
-    // iOS/Android: context starts suspended. Must resume inside a user gesture.
-    if (a.state === 'suspended') {
-      try { a.resume(); } catch(e) {}
-    }
     musicOn = true;
     musicGain = a.createGain();
-    musicGain.gain.value = 0.07; // music sits well below SFX (~0.15)
+    musicGain.gain.value = 0.05; // music sits well below SFX (~0.15)
     musicGain.connect(a.destination);
     let i = 0;
     function step() {
       if (!musicOn || !musicGain) return;
       const a2 = ac(); if (!a2) return;
-      if (a2.state === 'suspended') { try { a2.resume(); } catch(e) {} }
       const t = a2.currentTime;
       // Lead note (sine, soft)
       {
@@ -100,26 +95,6 @@ window.Game = window.Game || {};
   function setMusicVolume(v) {
     if (musicGain) musicGain.gain.value = Math.max(0, Math.min(1, v));
   }
-
-  // Mobile audio unlock: on first user gesture, create context and play a silent
-  // tone so future programmatic playback (music, SFX) is permitted.
-  let unlocked = false;
-  function unlock() {
-    if (unlocked) return;
-    const a = ac(); if (!a) return;
-    if (a.state === 'suspended') { try { a.resume(); } catch(e) {} }
-    try {
-      const o = a.createOscillator();
-      const g = a.createGain();
-      g.gain.value = 0;
-      o.connect(g); g.connect(a.destination);
-      o.start(); o.stop(a.currentTime + 0.01);
-    } catch(e) {}
-    unlocked = true;
-  }
-  ['touchstart','touchend','mousedown','keydown','click'].forEach(ev => {
-    window.addEventListener(ev, unlock, { once: false, passive: true, capture: true });
-  });
 
   G.sfx = {
     resume() { const a = ac(); if (a && a.state === 'suspended') a.resume(); },
