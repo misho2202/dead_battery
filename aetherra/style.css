@@ -100,10 +100,12 @@ canvas#game {
   -webkit-overflow-scrolling: touch;
 }
 @media (max-height: 480px) {
-  #screen { justify-content: flex-start; padding: 12px; gap: 10px; }
-  #screen h1 { font-size: clamp(18px, 4.5vw, 28px); letter-spacing: 1px; }
+  #screen { justify-content: flex-start; padding: 0 12px 12px; gap: 8px; }
+  #screen h1 { font-size: clamp(16px, 4vw, 24px); letter-spacing: 1px; margin-top: 6px; }
   #screen p  { font-size: clamp(11px, 2vw, 14px); line-height: 1.35; }
   #screen button { padding: 10px 22px; font-size: 14px; }
+  #lang-flags { padding: 6px 8px; }
+  #lang-flags .flag { padding: 8px 14px; min-height: 38px; }
 }
 #screen h1 {
   font-size: clamp(20px, 5vw, 42px);
@@ -131,33 +133,41 @@ canvas#game {
 }
 #screen button:hover { background: #6ee5b8; }
 
+/* Language picker — pinned to the top strip of the title screen so it can never
+   be hidden by long intro text or small viewports. */
 #lang-flags {
+  position: sticky;
+  top: 0;
+  z-index: 20;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
   width: 100%;
+  padding: 10px 8px;
+  background: rgba(8, 10, 16, 0.97);
+  border-bottom: 2px solid #4ad6a0;
+  box-shadow: 0 2px 16px rgba(74, 214, 160, 0.25);
 }
 #lang-label {
   color: #4ad6a0;
-  font-size: clamp(13px, 2.5vw, 16px);
+  font-size: clamp(12px, 2.5vw, 16px);
   font-weight: bold;
   letter-spacing: 1px;
 }
 #lang-flags .flag-row {
   display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
+  gap: 10px;
   justify-content: center;
 }
 #lang-flags .flag {
-  background: rgba(74, 214, 160, 0.15);
+  background: rgba(74, 214, 160, 0.18);
   border: 2px solid #4ad6a0;
   border-radius: 8px;
   padding: 10px 18px;
-  min-width: 60px;
+  min-width: 56px;
   min-height: 44px;
-  font-size: clamp(16px, 3.5vw, 22px);
+  font-size: clamp(15px, 3.2vw, 22px);
   font-weight: bold;
   color: #fff;
   cursor: pointer;
