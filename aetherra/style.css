@@ -11,17 +11,32 @@ html, body {
 #game-wrap {
   position: relative;
   width: 100vw; height: 100vh;
+  height: 100dvh;
   display: flex; align-items: center; justify-content: center;
 }
 canvas#game {
   background: #1a1f2b;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
-  width: min(100vw, calc(100vh * 16 / 9));
-  height: auto;
-  max-height: 100vh;
+  width: min(100vw, calc(100dvh * 16 / 9));
+  height: min(100dvh, calc(100vw * 9 / 16));
   box-shadow: 0 0 0 2px #2a3142, 0 0 40px rgba(0,255,180,0.08);
 }
+
+#fullscreen-btn {
+  position: absolute;
+  top: 6px; right: 8px;
+  width: 36px; height: 36px;
+  border: 2px solid rgba(255,255,255,0.45);
+  background: rgba(20, 28, 40, 0.65);
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  font-family: inherit;
+  border-radius: 4px;
+  z-index: 10;
+}
+#fullscreen-btn:hover { background: rgba(74, 214, 160, 0.45); }
 
 #hud {
   position: absolute;
@@ -90,20 +105,21 @@ canvas#game {
 }
 #touch .pad {
   position: absolute;
-  bottom: 12px;
-  display: flex; gap: 10px;
+  bottom: max(20px, env(safe-area-inset-bottom, 20px));
+  display: flex; gap: 12px;
   pointer-events: auto;
 }
-#touch .pad.left { left: 12px; }
-#touch .pad.right { right: 12px; }
+#touch .pad.left  { left:  max(16px, env(safe-area-inset-left, 16px)); }
+#touch .pad.right { right: max(16px, env(safe-area-inset-right, 16px)); }
 #touch button {
-  width: 56px; height: 56px;
+  width: 64px; height: 64px;
   border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.4);
-  background: rgba(20, 28, 40, 0.55);
+  border: 2px solid rgba(255,255,255,0.45);
+  background: rgba(20, 28, 40, 0.6);
   color: #fff;
-  font-size: 22px;
+  font-size: 24px;
   font-family: inherit;
+  touch-action: manipulation;
 }
 #touch button:active { background: rgba(74, 214, 160, 0.45); }
 

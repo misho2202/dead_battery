@@ -10,6 +10,9 @@ window.Game = window.Game || {};
   let level = null;
   let player = null;
   let camX = 0, camY = 0;
+  let levelTimer = 40;
+  const LEVEL_TIME = 40;
+  let carriedHealth = 3;
   G.totalBatteries = 0;
   let totalPossible = 0;
   for (const def of G.LEVELS) {
@@ -33,8 +36,10 @@ window.Game = window.Game || {};
     levelIdx = i;
     level = new G.Level(G.LEVELS[i]);
     player = new G.Player(level.spawn.x, level.spawn.y);
+    player.health = carriedHealth;
     G.player = player;
     camX = 0; camY = 0;
+    levelTimer = LEVEL_TIME;
     state = 'playing';
     G.ui.hideScreen();
     G.ui.hideDialog();
@@ -43,23 +48,30 @@ window.Game = window.Game || {};
   }
 
   function respawn() {
-    // Restore health, return to spawn, keep batteries collected
+    // Return to spawn, keep batteries collected and remaining hearts
+    const h = player.health;
     player = new G.Player(level.spawn.x, level.spawn.y);
+    player.health = h;
     G.player = player;
   }
 
   function nextLevel() {
     if (levelIdx + 1 < G.LEVELS.length) {
+      carriedHealth = player.health;
       loadLevel(levelIdx + 1);
     } else {
       finishGame();
     }
   }
 
-  function finishGame() {
+  function finishGame(viaExit) {
     state = 'ending';
     G.save.setBest(G.totalBatteries);
-    const pct = totalPossible > 0 ? G.totalBatteries / totalPossible : 0;
+    const allCollected = totalPossible > 0 && G.totalBatteries >= totalPossible;
+    const finishedLastLevel = !!viaExit;
+    let pct = totalPossible > 0 ? G.totalBatteries / totalPossible : 0;
+    if (allCollected && !finishedLastLevel) pct = 0.95;
+    else if (allCollected && finishedLastLevel) pct = 1.0;
     let title, text;
     if (pct >= 0.85) {
       title = '🌿 Good Ending';
@@ -76,6 +88,7 @@ window.Game = window.Game || {};
     }
     G.ui.showScreen(title, text, 'Play Again', () => {
       G.totalBatteries = 0;
+      carriedHealth = 3;
       startTitle();
     });
   }
@@ -98,6 +111,14 @@ window.Game = window.Game || {};
         state = 'playing';
         G.ui.hideDialog();
       }
+      return;
+    }
+
+    // Level countdown timer
+    levelTimer -= dt;
+    if (levelTimer <= 0) {
+      levelTimer = 0;
+      finishGame();
       return;
     }
 
@@ -145,7 +166,7 @@ window.Game = window.Game || {};
     if (level.exitRect && G.rectsOverlap(playerRect, level.exitRect)) {
       G.sfx.power();
       if (levelIdx + 1 >= G.LEVELS.length) {
-        finishGame();
+        finishGame(true);
         return;
       }
       state = 'levelComplete';
@@ -190,6 +211,20 @@ window.Game = window.Game || {};
     }
 
     G.ui.setHud(level, G.totalBatteries, G.save.getBest());
+
+    // Countdown timer (top-right)
+    const t = Math.ceil(Math.max(0, levelTimer));
+    ctx.save();
+    ctx.font = 'bold 22px monospace';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'top';
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#000';
+    ctx.fillStyle = t <= 10 ? '#ff5050' : '#ffffff';
+    const tx = VW - 56, ty = 10;
+    ctx.strokeText(`${t}s`, tx, ty);
+    ctx.fillText(`${t}s`, tx, ty);
+    ctx.restore();
   }
 
   let lastT = performance.now();
@@ -204,6 +239,22 @@ window.Game = window.Game || {};
   // Click-anywhere on screen to also resume audio
   document.addEventListener('click', () => G.sfx.resume(), { passive: true });
   document.addEventListener('touchstart', () => G.sfx.resume(), { passive: true });
+
+  // Fullscreen toggle (mobile-friendly)
+  const fsBtn = document.getElementById('fullscreen-btn');
+  if (fsBtn) {
+    fsBtn.addEventListener('click', () => {
+      const el = document.documentElement;
+      const inFs = document.fullscreenElement || document.webkitFullscreenElement;
+      if (!inFs) {
+        const req = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+        if (req) req.call(el);
+      } else {
+        const exit = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
+        if (exit) exit.call(document);
+      }
+    });
+  }
 
   startTitle();
   requestAnimationFrame(now => { lastT = now; frame(now); });

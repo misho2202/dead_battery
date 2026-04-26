@@ -279,7 +279,7 @@ window.Game = window.Game || {};
   G.DebrisEmitter = class {
     constructor(x, y) {
       this.x = x; this.y = y; this.w = TILE*4; this.h = TILE*8;
-      this.alive = true; this.cd = 1.5 + Math.random()*1;
+      this.alive = true; this.cd = 1.0 + Math.random()*0.4;
     }
     update(dt, level, player) {
       if (!player) return;
@@ -287,7 +287,7 @@ window.Game = window.Game || {};
       if (Math.abs(pcx - (this.x + TILE/2)) < TILE*3 && player.y > this.y) {
         this.cd -= dt;
         if (this.cd <= 0) {
-          this.cd = 1.6 + Math.random()*0.8;
+          this.cd = 1.2 + (Math.random()*0.2 - 0.1);
           level.entities.push(new G.FallingDebris(this.x + 5 + Math.random()*10, this.y));
         }
       }
