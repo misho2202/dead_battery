@@ -1,0 +1,143 @@
+🎮 Game Prompt: Aetherra: Last Spark
+
+Game Type:
+2D side-scrolling retro platformer inspired by classics like Super Mario Bros.
+
+Platform:
+Browser-based (HTML5 / Canvas / WebGL)
+
+Works on desktop (keyboard) and mobile (touch controls)
+Fully client-side (no server required)
+🌍 Core Concept
+
+In the polluted world of Aetherra, players take on the role of a young explorer determined to restore balance by collecting discarded batteries and bringing them back into the energy cycle.
+
+The game combines:
+
+Platforming (jump, run, avoid hazards)
+Exploration
+Light puzzle mechanics
+Environmental restoration system
+🕹️ Controls
+
+Desktop:
+
+⬅️ / ➡️ Arrow Keys → Move left/right
+SPACE → Jump
+(Optional) SHIFT → Sprint
+
+Mobile:
+
+Left side: ⬅️ ➡️ touch buttons
+Right side: ⬆️ Jump button
+Responsive UI overlay
+🎨 Visual Style
+Pixel-art, retro 16-bit aesthetic
+Bright but slightly desaturated palette (to reflect pollution vs restoration)
+Smooth parallax scrolling backgrounds
+Animated tiles (water, fog, toxic zones)
+Before/after environmental transformation visuals
+🌱 Story Summary
+
+Aetherra was once a perfect balance of nature and technology. Over time, discarded batteries poisoned the land.
+
+You discover a hidden message:
+
+Batteries are not waste—they can be reused.
+
+You begin a journey across corrupted regions to collect batteries and restore life.
+
+🧩 Gameplay Features
+1. Platforming Mechanics
+Running, jumping, gravity physics
+Moving platforms
+Breakable blocks
+Hidden areas
+2. Battery Collection System
+Collectible items: 🔋 batteries
+Each battery contributes to:
+Level restoration
+Score
+Ending outcome
+3. Environmental Transformation (Core Mechanic)
+As player collects batteries:
+Toxic fog disappears
+Water becomes clear
+Plants regrow
+Wildlife returns
+4. Hazards
+Toxic spills (damage over time)
+Polluted water
+Mutated creatures
+Falling debris
+5. Light Puzzle Elements
+Activate generators
+Restore power circuits
+Move objects to unlock paths
+🗺️ Levels / Worlds
+🏙️ Abandoned City
+Rooftop jumping
+Mechanical puzzles
+Broken elevators
+🌲 Polluted Forest
+Toxic zones
+Animal rescue interactions
+Hidden safe paths
+🏭 Industrial Ruins
+Conveyor belts
+Dark corridors
+Energy systems to repair
+🕳️ Underground Tunnels
+Tight platforming
+Limited visibility
+Environmental hazards
+👥 Characters
+Player: customizable (boy/girl explorer)
+Helpers: NPCs giving hints, tools, upgrades
+Opposers: characters who believe it's too late
+⚡ Progression System
+Batteries = progress currency
+Unlock:
+New areas
+Abilities (double jump, resistance suit)
+Visual world restoration
+🏁 Endings (Dynamic Outcome)
+🌿 Good Ending
+Most batteries collected
+World fully restored
+🌫️ Partial Ending
+Some regions remain polluted
+⚠️ Bad Ending
+Heavy environmental damage persists
+💡 Core Message
+
+Batteries are not trash — they are a responsibility.
+
+⚙️ Technical Requirements
+Pure frontend:
+HTML + CSS + JavaScript
+Optional libraries:
+Canvas API or lightweight engine (like Phaser.js)
+No login / no backend
+Save progress using:
+LocalStorage
+📱 UX Requirements
+Responsive design
+Touch-friendly controls
+Smooth 60 FPS gameplay
+Lightweight assets for fast loading
+🔊 Audio
+Retro chiptune soundtrack
+Environmental sound effects:
+Wind
+Machines
+Water
+Feedback sounds:
+Jump
+Collect item
+Damage
+🧠 Optional Enhancements
+Mini-map
+Battery radar
+Day/night cycle
+Score leaderboard (local only)

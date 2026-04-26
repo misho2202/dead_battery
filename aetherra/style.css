@@ -1,0 +1,110 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  height: 100%; width: 100%;
+  background: #0b0d12;
+  color: #e8ecf1;
+  font-family: 'Courier New', monospace;
+  overflow: hidden;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+#game-wrap {
+  position: relative;
+  width: 100vw; height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+}
+canvas#game {
+  background: #1a1f2b;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  width: min(100vw, calc(100vh * 16 / 9));
+  height: auto;
+  max-height: 100vh;
+  box-shadow: 0 0 0 2px #2a3142, 0 0 40px rgba(0,255,180,0.08);
+}
+
+#hud {
+  position: absolute;
+  top: 8px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; gap: 16px;
+  font-size: 14px;
+  text-shadow: 1px 1px 0 #000;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+#dialog {
+  position: absolute;
+  bottom: 16%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(10, 14, 22, 0.92);
+  border: 2px solid #4ad6a0;
+  padding: 12px 18px;
+  width: min(70vw, 480px);
+  font-size: 14px;
+  line-height: 1.4;
+}
+#dialog-name { color: #4ad6a0; font-weight: bold; margin-bottom: 4px; }
+#dialog-hint { font-size: 11px; color: #8c95a8; margin-top: 6px; text-align: right; }
+
+#screen {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  background: rgba(8, 10, 16, 0.94);
+  text-align: center;
+  padding: 20px;
+  gap: 18px;
+}
+#screen h1 {
+  font-size: clamp(20px, 5vw, 42px);
+  color: #4ad6a0;
+  text-shadow: 0 0 20px rgba(74,214,160,0.4);
+  letter-spacing: 2px;
+}
+#screen p {
+  max-width: 540px;
+  font-size: clamp(12px, 2.2vw, 16px);
+  color: #c0c8d4;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+#screen button {
+  background: #4ad6a0;
+  color: #0b0d12;
+  border: none;
+  padding: 12px 28px;
+  font-family: inherit;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  letter-spacing: 1px;
+}
+#screen button:hover { background: #6ee5b8; }
+
+#touch {
+  position: absolute; inset: 0;
+  pointer-events: none;
+}
+#touch .pad {
+  position: absolute;
+  bottom: 12px;
+  display: flex; gap: 10px;
+  pointer-events: auto;
+}
+#touch .pad.left { left: 12px; }
+#touch .pad.right { right: 12px; }
+#touch button {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.4);
+  background: rgba(20, 28, 40, 0.55);
+  color: #fff;
+  font-size: 22px;
+  font-family: inherit;
+}
+#touch button:active { background: rgba(74, 214, 160, 0.45); }
+
+.hidden { display: none !important; }

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>Aetherra: Last Spark</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="game-wrap">
+    <canvas id="game" width="640" height="360"></canvas>
+
+    <div id="hud">
+      <span id="hud-level">Aetherra</span>
+      <span id="hud-batteries">🔋 0 / 0</span>
+      <span id="hud-health">❤❤❤</span>
+      <span id="hud-total">Total: 0</span>
+    </div>
+
+    <div id="dialog" class="hidden">
+      <div id="dialog-name"></div>
+      <div id="dialog-text"></div>
+      <div id="dialog-hint">Press E / tap to continue</div>
+    </div>
+
+    <div id="screen" class="hidden">
+      <h1 id="screen-title">Aetherra: Last Spark</h1>
+      <p id="screen-text"></p>
+      <button id="screen-btn">Start</button>
+    </div>
+
+    <div id="touch" class="hidden">
+      <div class="pad left">
+        <button data-key="ArrowLeft">◀</button>
+        <button data-key="ArrowRight">▶</button>
+      </div>
+      <div class="pad right">
+        <button data-key="KeyE">E</button>
+        <button data-key="Space">▲</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/audio.js"></script>
+  <script src="js/input.js"></script>
+  <script src="js/save.js"></script>
+  <script src="js/levels.js"></script>
+  <script src="js/entities.js"></script>
+  <script src="js/level.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
