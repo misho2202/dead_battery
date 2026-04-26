@@ -17,6 +17,7 @@
       <span id="hud-total">Total: 0</span>
     </div>
 
+    <button id="pause-btn" title="Pause">⏸</button>
     <button id="fullscreen-btn" title="Fullscreen">⛶</button>
 
     <div id="dialog" class="hidden">
@@ -28,6 +29,11 @@
     <div id="screen" class="hidden">
       <h1 id="screen-title">Aetherra: Last Spark</h1>
       <p id="screen-text"></p>
+      <div id="lang-flags" class="hidden">
+        <button class="flag" data-lang="en" title="English">EN</button>
+        <button class="flag" data-lang="hy" title="Հայերեն">🇦🇲</button>
+        <button class="flag" data-lang="ru" title="Русский">🇷🇺</button>
+      </div>
       <button id="screen-btn">Start</button>
     </div>
 
@@ -43,6 +49,7 @@
     </div>
   </div>
 
+  <script src="js/i18n.js"></script>
   <script src="js/audio.js"></script>
   <script src="js/input.js"></script>
   <script src="js/save.js"></script>

@@ -11,8 +11,16 @@ window.Game = window.Game || {};
   let player = null;
   let camX = 0, camY = 0;
   let levelTimer = 40;
-  const LEVEL_TIME = 40;
+  const DEFAULT_LEVEL_TIME = 40;
   let carriedHealth = 3;
+  let paused = false;
+  let shakeT = 0, shakeMag = 0;
+  let lastWarnSec = -1; // last whole second at which we played the timer beep
+  G.timeWarn = false;
+  G.shake = function(mag, dur) {
+    shakeMag = Math.max(shakeMag, mag);
+    shakeT   = Math.max(shakeT, dur);
+  };
   G.totalBatteries = 0;
   let totalPossible = 0;
   for (const def of G.LEVELS) {
@@ -22,15 +30,23 @@ window.Game = window.Game || {};
   function startTitle() {
     state = 'title';
     G.ui.showScreen(
-      'Aetherra: Last Spark',
-      'The world is poisoned by discarded batteries.\n' +
-      'Collect them, restore the land, save Aetherra.\n\n' +
-      'Move: ← →   Jump: Space   Sprint: Shift   Interact: E\n' +
-      `Best run: ${G.save.getBest()} batteries`,
-      'Start',
-      () => loadLevel(0)
+      G.t('title'),
+      G.t('intro', { best: G.save.getBest() }),
+      G.t('start_btn'),
+      () => loadLevel(0),
+      { showFlags: true }
     );
   }
+
+  // Flag click handlers (set up once)
+  for (const b of document.querySelectorAll('#lang-flags .flag')) {
+    b.addEventListener('click', () => {
+      G.i18n.setLang(b.dataset.lang);
+    });
+  }
+  G.onLangChange = function() {
+    if (state === 'title') startTitle();
+  };
 
   function loadLevel(i) {
     levelIdx = i;
@@ -39,12 +55,15 @@ window.Game = window.Game || {};
     player.health = carriedHealth;
     G.player = player;
     camX = 0; camY = 0;
-    levelTimer = LEVEL_TIME;
+    levelTimer = (G.LEVELS[i].time != null) ? G.LEVELS[i].time : DEFAULT_LEVEL_TIME;
+    lastWarnSec = -1;
     state = 'playing';
+    paused = false;
+    setPauseBtnIcon();
     G.ui.hideScreen();
     G.ui.hideDialog();
-    G.ui.showDialog(level.name, level.hint);
-    setTimeout(() => { if (state === 'playing') G.ui.hideDialog(); }, 3500);
+    G.ui.showDialog(G.ui.levelName(level), G.ui.levelHint(level), { autoHide: 6000, hideHint: true });
+    G.sfx.music.start();
   }
 
   function respawn() {
@@ -66,27 +85,31 @@ window.Game = window.Game || {};
 
   function finishGame(viaExit) {
     state = 'ending';
+    G.timeWarn = false;
+    G.sfx.music.stop();
     G.save.setBest(G.totalBatteries);
     const allCollected = totalPossible > 0 && G.totalBatteries >= totalPossible;
     const finishedLastLevel = !!viaExit;
     let pct = totalPossible > 0 ? G.totalBatteries / totalPossible : 0;
     if (allCollected && !finishedLastLevel) pct = 0.95;
     else if (allCollected && finishedLastLevel) pct = 1.0;
+    const pctRound = Math.round(pct*100);
+    const vars = { got: G.totalBatteries, total: totalPossible, pct: pctRound };
     let title, text;
     if (pct >= 0.85) {
-      title = '🌿 Good Ending';
-      text = `Aetherra is reborn. The fog lifts, plants regrow, the wildlife returns.\n\nYou collected ${G.totalBatteries} of ${totalPossible} batteries (${Math.round(pct*100)}%).\nBatteries are not waste — they are a responsibility.`;
+      title = G.t('ending_good_title');
+      text = G.t('ending_good_text', vars);
       G.sfx.win();
     } else if (pct >= 0.40) {
-      title = '🌫️ Partial Ending';
-      text = `Some regions begin to heal, but corruption lingers.\n\nYou collected ${G.totalBatteries} of ${totalPossible} batteries (${Math.round(pct*100)}%).\nThere is still hope, if more is gathered.`;
+      title = G.t('ending_partial_title');
+      text = G.t('ending_partial_text', vars);
       G.sfx.win();
     } else {
-      title = '⚠️ Bad Ending';
-      text = `The damage was too great. Aetherra fades into silence.\n\nYou collected ${G.totalBatteries} of ${totalPossible} batteries (${Math.round(pct*100)}%).\nTry again — the world depends on it.`;
+      title = G.t('ending_bad_title');
+      text = G.t('ending_bad_text', vars);
       G.sfx.bad();
     }
-    G.ui.showScreen(title, text, 'Play Again', () => {
+    G.ui.showScreen(title, text, G.t('play_again'), () => {
       G.totalBatteries = 0;
       carriedHealth = 3;
       startTitle();
@@ -106,6 +129,10 @@ window.Game = window.Game || {};
 
     if (state !== 'playing' && state !== 'dialog') return;
 
+    // Pause toggle (works during dialog/playing)
+    if (G.input.pressed('KeyP')) togglePause();
+    if (paused) return;
+
     if (state === 'dialog') {
       if (G.input.interact() || G.input.jump()) {
         state = 'playing';
@@ -116,6 +143,17 @@ window.Game = window.Game || {};
 
     // Level countdown timer
     levelTimer -= dt;
+
+    // Time-warning beeps & flag (≤10s)
+    G.timeWarn = levelTimer <= 10;
+    const sec = Math.ceil(Math.max(0, levelTimer));
+    if (G.timeWarn && sec !== lastWarnSec && sec > 0) {
+      if (sec === 10 || (sec >= 1 && sec <= 5)) {
+        if (sec <= 3) G.sfx.warnFinal(); else G.sfx.warn();
+      }
+      lastWarnSec = sec;
+    }
+
     if (levelTimer <= 0) {
       levelTimer = 0;
       finishGame();
@@ -155,11 +193,17 @@ window.Game = window.Game || {};
       interactTarget.interact(player, level);
     }
 
-    // Drain dialog queue
+    // Drain dialog queue (blocking dialogs from entities)
     if (level.dialogQueue) {
       G.ui.showDialog(level.dialogQueue.name, level.dialogQueue.text);
       state = 'dialog';
       level.dialogQueue = null;
+    }
+
+    // Decay screen shake
+    if (shakeT > 0) {
+      shakeT -= dt;
+      if (shakeT <= 0) { shakeT = 0; shakeMag = 0; }
     }
 
     // Exit reached
@@ -172,9 +216,9 @@ window.Game = window.Game || {};
       state = 'levelComplete';
       const pct = level.batteriesTotal > 0 ? Math.round(level.batteriesGot / level.batteriesTotal * 100) : 100;
       G.ui.showScreen(
-        `${level.name} — Cleared`,
-        `Batteries: ${level.batteriesGot} / ${level.batteriesTotal}  (${pct}% restored)\nTotal collected so far: ${G.totalBatteries}`,
-        'Next Level',
+        G.t('cleared_title', { name: G.ui.levelName(level) }),
+        G.t('cleared_text', { got: level.batteriesGot, total: level.batteriesTotal, pct, tot: G.totalBatteries }),
+        G.t('next_level'),
         () => nextLevel()
       );
     }
@@ -184,6 +228,18 @@ window.Game = window.Game || {};
 
   function draw() {
     if (!level) return;
+
+    // Apply screen shake by translating the canvas
+    const shakeOn = shakeT > 0 && shakeMag > 0;
+    let sx = 0, sy = 0;
+    if (shakeOn) {
+      const k = Math.min(1, shakeT / 0.35);
+      sx = (Math.random() - 0.5) * 2 * shakeMag * k;
+      sy = (Math.random() - 0.5) * 2 * shakeMag * k;
+    }
+    ctx.save();
+    if (shakeOn) ctx.translate(sx, sy);
+
     level.drawBackground(ctx, camX, camY, VW, VH);
     level.drawTiles(ctx, camX, camY, VW, VH);
 
@@ -210,21 +266,38 @@ window.Game = window.Game || {};
       }
     }
 
-    G.ui.setHud(level, G.totalBatteries, G.save.getBest());
+    ctx.restore(); // end shake transform — HUD + timer should never shake
+
+    G.ui.setHud(level, G.totalBatteries, G.save.getBest(), { timeWarn: G.timeWarn });
 
     // Countdown timer (top-right)
     const t = Math.ceil(Math.max(0, levelTimer));
+    const warn = t <= 10;
+    const pulse = warn ? (1 + Math.sin(performance.now() / 90) * 0.18) : 1;
     ctx.save();
-    ctx.font = 'bold 22px monospace';
+    ctx.font = `bold ${Math.round(22 * pulse)}px monospace`;
     ctx.textAlign = 'right';
     ctx.textBaseline = 'top';
     ctx.lineWidth = 3;
     ctx.strokeStyle = '#000';
-    ctx.fillStyle = t <= 10 ? '#ff5050' : '#ffffff';
+    ctx.fillStyle = warn ? '#ff5050' : '#ffffff';
     const tx = VW - 56, ty = 10;
     ctx.strokeText(`${t}s`, tx, ty);
     ctx.fillText(`${t}s`, tx, ty);
+    if (warn) {
+      ctx.font = 'bold 9px monospace';
+      ctx.fillStyle = '#ff8080';
+      ctx.fillText('TIME!', tx, ty + Math.round(22 * pulse) + 2);
+    }
     ctx.restore();
+
+    // Pause overlay tint (over everything)
+    if (paused) {
+      ctx.save();
+      ctx.fillStyle = 'rgba(0,0,0,0.35)';
+      ctx.fillRect(0, 0, VW, VH);
+      ctx.restore();
+    }
   }
 
   let lastT = performance.now();
@@ -239,6 +312,25 @@ window.Game = window.Game || {};
   // Click-anywhere on screen to also resume audio
   document.addEventListener('click', () => G.sfx.resume(), { passive: true });
   document.addEventListener('touchstart', () => G.sfx.resume(), { passive: true });
+
+  // Pause toggle (button + key)
+  const pauseBtn = document.getElementById('pause-btn');
+  function setPauseBtnIcon() {
+    if (pauseBtn) pauseBtn.textContent = paused ? '▶' : '⏸';
+  }
+  function togglePause() {
+    if (state !== 'playing' && state !== 'dialog') return;
+    paused = !paused;
+    setPauseBtnIcon();
+    if (paused) {
+      G.sfx.music.stop();
+      G.ui.showDialog(G.t('paused'), G.t('paused_hint'), { hideHint: true });
+    } else {
+      G.ui.hideDialog();
+      G.sfx.music.start();
+    }
+  }
+  if (pauseBtn) pauseBtn.addEventListener('click', togglePause);
 
   // Fullscreen toggle (mobile-friendly)
   const fsBtn = document.getElementById('fullscreen-btn');

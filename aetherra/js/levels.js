@@ -104,7 +104,7 @@ window.Game = window.Game || {};
       id: 'city', name: '🏙️ Abandoned City',
       hint: 'Climb up the platforms. Find the switch (s) and press E. Then reach the exit.',
       palette: { sky:'#3a425b', skyTop:'#1a2235', solid:'#5a6478', solidTop:'#7a8498', plat:'#8a9aae', water:'#3a6a8a', toxic:'#88dd55', accent:'#aab2c8' },
-      bg: 'city', bgImage: 'forest-level-01.jpg', rows: L1
+      bg: 'city', bgImage: 'forest-level-01.jpg', time: 60, rows: L1
     },
     {
       id: 'forest', name: '🌲 Polluted Forest',

@@ -30,9 +30,12 @@ window.Game = window.Game || {};
     }
     draw(ctx, camX, camY) {
       const px = this.x - camX, py = this.y - camY + Math.sin(this.t) * 2;
-      // soft red glow (matches the low-charge look)
-      ctx.fillStyle = 'rgba(255,80,80,0.22)';
-      ctx.fillRect(px - 3, py - 2, 24, 32);
+      // soft red glow (intensifies in the time-warning window)
+      const warn = !!G.timeWarn;
+      const pulse = warn ? (0.55 + Math.sin(this.t * 3) * 0.25) : 0.22;
+      const pad = warn ? 6 : 3;
+      ctx.fillStyle = `rgba(255,${warn ? 200 : 80},${warn ? 80 : 80},${pulse})`;
+      ctx.fillRect(px - pad, py - pad, this.w + pad*2, this.h + pad*2);
       if (batteryImgReady) {
         ctx.drawImage(batteryImg, px, py, this.w, this.h);
       } else {
@@ -61,8 +64,7 @@ window.Game = window.Game || {};
       this.activated = true;
       level.doorOpen = true;
       G.sfx.power();
-      G.ui.showDialog('System', 'Switch activated. Door unlocked!');
-      setTimeout(() => G.ui.hideDialog(), 1800);
+      G.ui.showDialog(G.t('system'), G.t('switch_msg'), { autoHide: 6000, hideHint: true });
       return true;
     }
     draw(ctx, camX, camY) {

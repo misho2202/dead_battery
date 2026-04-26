@@ -107,7 +107,8 @@ window.Game = window.Game || {};
     tileAt(px, py) {
       const tx = Math.floor(px / TILE);
       const ty = Math.floor(py / TILE);
-      if (tx < 0 || ty < 0 || tx >= this.w || ty >= this.h) return '.';
+      if (ty < 0 || ty >= this.h) return '.';
+      if (tx < 0 || tx >= this.w) return '#';
       return this.tiles[ty][tx];
     }
 
@@ -405,7 +406,7 @@ window.Game = window.Game || {};
         ctx.fillStyle = '#fff';
         ctx.font = 'bold 12px monospace';
         ctx.textAlign = 'center';
-        ctx.fillText('EXIT', ex + this.exitRect.w/2, ey + this.exitRect.h/2 + 4);
+        ctx.fillText(G.t('exit_label'), ex + this.exitRect.w/2, ey + this.exitRect.h/2 + 4);
       }
     }
 

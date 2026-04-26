@@ -25,6 +25,7 @@ window.Game = window.Game || {};
       this.health -= n;
       this.iframes = 1.0;
       G.sfx.hurt();
+      if (G.shake) G.shake(5, 0.35);
       if (this.health <= 0) {
         this.dead = true;
         this.deathT = 0;

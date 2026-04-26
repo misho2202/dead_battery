@@ -38,6 +38,30 @@ canvas#game {
 }
 #fullscreen-btn:hover { background: rgba(74, 214, 160, 0.45); }
 
+#pause-btn {
+  position: absolute;
+  top: 6px; right: 50px;
+  width: 36px; height: 36px;
+  border: 2px solid rgba(255,255,255,0.45);
+  background: rgba(20, 28, 40, 0.65);
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  font-family: inherit;
+  border-radius: 4px;
+  z-index: 10;
+}
+#pause-btn:hover { background: rgba(74, 214, 160, 0.45); }
+
+.hud-warn {
+  color: #ff5050;
+  animation: hudPulse 0.6s ease-in-out infinite alternate;
+}
+@keyframes hudPulse {
+  from { transform: scale(1);    text-shadow: 1px 1px 0 #000; }
+  to   { transform: scale(1.18); text-shadow: 1px 1px 0 #000, 0 0 8px rgba(255,80,80,0.7); }
+}
+
 #hud {
   position: absolute;
   top: 8px; left: 50%;
@@ -98,6 +122,27 @@ canvas#game {
   letter-spacing: 1px;
 }
 #screen button:hover { background: #6ee5b8; }
+
+#lang-flags { display: flex; gap: 14px; }
+#lang-flags .flag {
+  background: rgba(20, 28, 40, 0.6);
+  border: 2px solid rgba(255,255,255,0.25);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: clamp(22px, 4vw, 32px);
+  color: #fff;
+  cursor: pointer;
+  font-family: inherit;
+  line-height: 1;
+  transition: border-color 0.15s, background 0.15s, transform 0.15s;
+}
+#lang-flags .flag:hover { background: rgba(74, 214, 160, 0.25); }
+#lang-flags .flag.selected {
+  border-color: #4ad6a0;
+  background: rgba(74, 214, 160, 0.25);
+  box-shadow: 0 0 14px rgba(74,214,160,0.5);
+  transform: scale(1.08);
+}
 
 #touch {
   position: absolute; inset: 0;
