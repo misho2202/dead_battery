@@ -147,7 +147,7 @@ canvas#game {
 #lang-flags .flag-row {
   display: flex;
   gap: 12px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: center;
 }
 #lang-flags .flag {
@@ -163,7 +163,13 @@ canvas#game {
   cursor: pointer;
   font-family: inherit;
   line-height: 1;
+  white-space: nowrap;
+  flex-shrink: 0;
   transition: border-color 0.15s, background 0.15s, transform 0.15s;
+}
+@media (max-width: 480px) {
+  #lang-flags .flag-row { gap: 8px; }
+  #lang-flags .flag { padding: 8px 14px; min-width: 52px; min-height: 40px; font-size: 16px; }
 }
 #lang-flags .flag:hover { background: rgba(74, 214, 160, 0.25); }
 #lang-flags .flag.selected {
